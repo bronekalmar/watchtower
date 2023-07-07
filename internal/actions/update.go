@@ -18,6 +18,7 @@ import (
 // the new image.
 func Update(client container.Client, params types.UpdateParams) (types.Report, error) {
 	log.Debug("Checking containers for updated images")
+	log.Info("MonitorOnlyOverride: ", params.MonitorOnlyOverride)
 	progress := &session.Progress{}
 	staleCount := 0
 
@@ -34,7 +35,7 @@ func Update(client container.Client, params types.UpdateParams) (types.Report, e
 
 	for i, targetContainer := range containers {
 		stale, newestImage, err := client.IsContainerStale(targetContainer)
-		shouldUpdate := stale && !params.NoRestart && !params.MonitorOnly && !targetContainer.IsMonitorOnly()
+		shouldUpdate := stale && !params.NoRestart && (!params.MonitorOnly && !targetContainer.IsMonitorOnly()) || params.MonitorOnlyOverride
 		if err == nil && shouldUpdate {
 			// Check to make sure we have all the necessary information for recreating the container
 			err = targetContainer.VerifyConfiguration()
@@ -72,7 +73,7 @@ func Update(client container.Client, params types.UpdateParams) (types.Report, e
 	UpdateImplicitRestart(containers)
 
 	var containersToUpdate []types.Container
-	if !params.MonitorOnly {
+	if !params.MonitorOnly || params.MonitorOnlyOverride {
 		for _, c := range containers {
 			if !c.IsMonitorOnly() {
 				containersToUpdate = append(containersToUpdate, c)

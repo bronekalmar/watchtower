@@ -28,17 +28,18 @@ import (
 )
 
 var (
-	client         container.Client
-	scheduleSpec   string
-	cleanup        bool
-	noRestart      bool
-	monitorOnly    bool
-	enableLabel    bool
-	notifier       t.Notifier
-	timeout        time.Duration
-	lifecycleHooks bool
-	rollingRestart bool
-	scope          string
+	client              container.Client
+	scheduleSpec        string
+	cleanup             bool
+	noRestart           bool
+	monitorOnly         bool
+	monitorOnlyOverride bool
+	enableLabel         bool
+	notifier            t.Notifier
+	timeout             time.Duration
+	lifecycleHooks      bool
+	rollingRestart      bool
+	scope               string
 )
 
 var rootCmd = NewRootCommand()
@@ -165,7 +166,7 @@ func Run(c *cobra.Command, names []string) {
 
 	if runOnce {
 		writeStartupMessage(c, time.Time{}, filterDesc)
-		runUpdatesWithNotifications(filter)
+		runUpdatesWithNotifications(filter, monitorOnlyOverride)
 		notifier.Close()
 		os.Exit(0)
 		return
@@ -183,10 +184,17 @@ func Run(c *cobra.Command, names []string) {
 
 	if enableUpdateAPI {
 		updateHandler := update.New(func(images []string) {
-			metric := runUpdatesWithNotifications(filters.FilterByImage(images, filter))
+			metric := runUpdatesWithNotifications(filters.FilterByImage(images, filter), true)
 			metrics.RegisterScan(metric)
 		}, updateLock)
 		httpAPI.RegisterFunc(updateHandler.Path, updateHandler.Handle)
+
+		updateCheckHandler := update.NewCheck(func(images []string) {
+			metric := runUpdatesWithNotifications(filters.FilterByImage(images, filter), false)
+			metrics.RegisterScan(metric)
+		}, updateLock)
+		httpAPI.RegisterFunc(updateCheckHandler.Path, updateCheckHandler.Handle)
+
 		// If polling isn't enabled the scheduler is never started and
 		// we need to trigger the startup messages manually.
 		if !unblockHTTPAPI {
@@ -322,7 +330,7 @@ func runUpgradesOnSchedule(c *cobra.Command, filter t.Filter, filtering string, 
 			select {
 			case v := <-lock:
 				defer func() { lock <- v }()
-				metric := runUpdatesWithNotifications(filter)
+				metric := runUpdatesWithNotifications(filter, monitorOnlyOverride)
 				metrics.RegisterScan(metric)
 			default:
 				// Update was skipped
@@ -356,16 +364,18 @@ func runUpgradesOnSchedule(c *cobra.Command, filter t.Filter, filtering string, 
 	return nil
 }
 
-func runUpdatesWithNotifications(filter t.Filter) *metrics.Metric {
+func runUpdatesWithNotifications(filter t.Filter, moof bool) *metrics.Metric {
 	notifier.StartNotification()
+
 	updateParams := t.UpdateParams{
-		Filter:         filter,
-		Cleanup:        cleanup,
-		NoRestart:      noRestart,
-		Timeout:        timeout,
-		MonitorOnly:    monitorOnly,
-		LifecycleHooks: lifecycleHooks,
-		RollingRestart: rollingRestart,
+		Filter:              filter,
+		Cleanup:             cleanup,
+		NoRestart:           noRestart,
+		Timeout:             timeout,
+		MonitorOnly:         monitorOnly,
+		MonitorOnlyOverride: moof,
+		LifecycleHooks:      lifecycleHooks,
+		RollingRestart:      rollingRestart,
 	}
 	result, err := actions.Update(client, updateParams)
 	if err != nil {

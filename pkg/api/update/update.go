@@ -28,6 +28,20 @@ func New(updateFn func(images []string), updateLock chan bool) *Handler {
 	}
 }
 
+func NewCheck(updateFn func(images []string), updateLock chan bool) *Handler {
+	if updateLock != nil {
+		lock = updateLock
+	} else {
+		lock = make(chan bool, 1)
+		lock <- true
+	}
+
+	return &Handler{
+		fn:   updateFn,
+		Path: "/v1/check-update",
+	}
+}
+
 // Handler is an API handler used for triggering container update scans
 type Handler struct {
 	fn   func(images []string)
