@@ -5,6 +5,7 @@ import (
 	"io"
 	stdlog "log"
 	"os"
+	"path/filepath"
 	"strings"
 	"text/template"
 	"time"
@@ -61,6 +62,26 @@ func GetLoggerFilepath(loggerURL string, scheme string) string {
 	return ""
 }
 
+func CreateFileAndPathIfNotExist(filePath string) error {
+	dirPath := filepath.Dir(filePath)
+
+	_, err := os.Stat(filePath)
+	if os.IsNotExist(err) {
+		err := os.MkdirAll(dirPath, os.ModePerm)
+		if err != nil {
+			return err
+		}
+
+		file, err := os.Create(filePath)
+		if err != nil {
+			return err
+		}
+		defer file.Close()
+	}
+
+	return nil
+}
+
 // GetNames returns a list of notification services that has been added
 func (n *shoutrrrTypeNotifier) GetNames() []string {
 	names := make([]string, len(n.Urls))
@@ -100,6 +121,7 @@ func createNotifier(urls []string, level log.Level, tplString string, legacy boo
 		scheme := GetScheme(urls[i])
 		if scheme == "logger" {
 			logfilePath = GetLoggerFilepath(urls[i], scheme)
+			CreateFileAndPathIfNotExist(logfilePath)
 		}
 	}
 
