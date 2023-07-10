@@ -2,6 +2,7 @@ package notifications
 
 import (
 	"bytes"
+	"io"
 	stdlog "log"
 	"os"
 	"strings"
@@ -52,6 +53,14 @@ func GetScheme(url string) string {
 	return url[:schemeEnd]
 }
 
+// GetLoggerFilepath returns the filepath part of logger://path/to/file url
+func GetLoggerFilepath(loggerURL string, scheme string) string {
+	if strings.HasPrefix(loggerURL, scheme) {
+		return loggerURL[len(scheme+":/"):]
+	}
+	return ""
+}
+
 // GetNames returns a list of notification services that has been added
 func (n *shoutrrrTypeNotifier) GetNames() []string {
 	names := make([]string, len(n.Urls))
@@ -78,14 +87,30 @@ func (n *shoutrrrTypeNotifier) AddLogHook() {
 	go sendNotifications(n)
 }
 
-func createNotifier(urls []string, level log.Level, tplString string, legacy bool, data StaticData, stdout bool, delay time.Duration) *shoutrrrTypeNotifier {
+func createNotifier(urls []string, level log.Level, tplString string, legacy bool, data StaticData, stdout bool, ldelay time.Duration) *shoutrrrTypeNotifier {
 	tpl, err := getShoutrrrTemplate(tplString, legacy)
 	if err != nil {
 		log.Errorf("Could not use configured notification template: %s. Using default template", err)
 	}
 
 	var logger types.StdLogger
-	if stdout {
+	var logfilePath string
+
+	for i := range urls {
+		scheme := GetScheme(urls[i])
+		if scheme == "logger" {
+			logfilePath = GetLoggerFilepath(urls[i], scheme)
+		}
+	}
+
+	if stdout && logfilePath != "" {
+		f, err := os.OpenFile(logfilePath, os.O_CREATE|os.O_WRONLY|os.O_APPEND, 0666)
+		if err != nil {
+			log.Fatalf("Failed to open log file: %s\n", err.Error())
+		}
+		w := io.MultiWriter(f, os.Stdout)
+		logger = stdlog.New(w, ``, 0)
+	} else if stdout && logfilePath == "" {
 		logger = stdlog.New(os.Stdout, ``, 0)
 	} else {
 		logger = stdlog.New(log.StandardLogger().WriterLevel(log.TraceLevel), "Shoutrrr: ", 0)

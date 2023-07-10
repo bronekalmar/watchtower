@@ -196,7 +196,7 @@ func RegisterNotificationFlags(rootCmd *cobra.Command) {
 		"notifications",
 		"n",
 		viper.GetStringSlice("WATCHTOWER_NOTIFICATIONS"),
-		" Notification types to send (valid: email, slack, msteams, gotify, shoutrrr)")
+		"Notification types to send (valid: email, slack, msteams, gotify, shoutrrr)")
 
 	flags.String(
 		"notifications-level",

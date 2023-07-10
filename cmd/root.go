@@ -364,7 +364,7 @@ func runUpgradesOnSchedule(c *cobra.Command, filter t.Filter, filtering string, 
 	return nil
 }
 
-func runUpdatesWithNotifications(filter t.Filter, moof bool) *metrics.Metric {
+func runUpdatesWithNotifications(filter t.Filter, monitorOnlyOverrideFlag bool) *metrics.Metric {
 	notifier.StartNotification()
 
 	updateParams := t.UpdateParams{
@@ -373,7 +373,7 @@ func runUpdatesWithNotifications(filter t.Filter, moof bool) *metrics.Metric {
 		NoRestart:           noRestart,
 		Timeout:             timeout,
 		MonitorOnly:         monitorOnly,
-		MonitorOnlyOverride: moof,
+		MonitorOnlyOverride: monitorOnlyOverrideFlag,
 		LifecycleHooks:      lifecycleHooks,
 		RollingRestart:      rollingRestart,
 	}
