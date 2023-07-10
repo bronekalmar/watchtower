@@ -121,11 +121,13 @@ func createNotifier(urls []string, level log.Level, tplString string, legacy boo
 		scheme := GetScheme(urls[i])
 		if scheme == "logger" {
 			logfilePath = GetLoggerFilepath(urls[i], scheme)
-			CreateFileAndPathIfNotExist(logfilePath)
+			if logfilePath != "/" {
+				CreateFileAndPathIfNotExist(logfilePath)
+			}
 		}
 	}
 
-	if stdout && logfilePath != "" {
+	if stdout && logfilePath != "" && logfilePath != "/" {
 		f, err := os.OpenFile(logfilePath, os.O_CREATE|os.O_WRONLY|os.O_APPEND, 0666)
 		if err != nil {
 			log.Fatalf("Failed to open log file: %s\n", err.Error())
