@@ -108,7 +108,7 @@ func (n *shoutrrrTypeNotifier) AddLogHook() {
 	go sendNotifications(n)
 }
 
-func createNotifier(urls []string, level log.Level, tplString string, legacy bool, data StaticData, stdout bool, ldelay time.Duration) *shoutrrrTypeNotifier {
+func createNotifier(urls []string, level log.Level, tplString string, legacy bool, data StaticData, stdout bool, delay time.Duration) *shoutrrrTypeNotifier {
 	tpl, err := getShoutrrrTemplate(tplString, legacy)
 	if err != nil {
 		log.Errorf("Could not use configured notification template: %s. Using default template", err)
