@@ -261,8 +261,8 @@ func UpdateImplicitRestart(containers []types.Container) {
 func linkedContainerMarkedForRestart(links []string, containers []types.Container) string {
 	for _, linkName := range links {
 		for _, candidate := range containers {
-			if candidate.Name() == linkName && candidate.ToRestart() {
-				return linkName
+			if candidate.ComposeServiceName() == linkName || candidate.Name() == linkName {
+				return candidate.Name()
 			}
 		}
 	}

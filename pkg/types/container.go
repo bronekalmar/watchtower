@@ -48,6 +48,7 @@ type Container interface {
 	ID() ContainerID
 	IsRunning() bool
 	Name() string
+	ComposeServiceName() string
 	ImageID() ImageID
 	SafeImageID() ImageID
 	ImageName() string

@@ -172,6 +172,17 @@ func (c Container) Scope() (string, bool) {
 	return rawString, true
 }
 
+// ComposeServiceName returns the com.docker.compose.service label value
+func (c Container) ComposeServiceName() string {
+	serviceNameLabel := c.getLabelValueOrEmpty(composeServiceNameLabel)
+
+	// Since the container names need to start with '/', let's prepend it if it's missing
+	if !strings.HasPrefix(serviceNameLabel, "/") {
+		serviceNameLabel = "/" + serviceNameLabel
+	}
+	return serviceNameLabel
+}
+
 // Links returns a list containing the names of all the containers to which
 // this container is linked.
 func (c Container) Links() []string {

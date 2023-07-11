@@ -1,20 +1,21 @@
 package container
 
 const (
-	watchtowerLabel        = "com.centurylinklabs.watchtower"
-	signalLabel            = "com.centurylinklabs.watchtower.stop-signal"
-	enableLabel            = "com.centurylinklabs.watchtower.enable"
-	monitorOnlyLabel       = "com.centurylinklabs.watchtower.monitor-only"
-	noPullLabel            = "com.centurylinklabs.watchtower.no-pull"
-	dependsOnLabel         = "com.centurylinklabs.watchtower.depends-on"
-	zodiacLabel            = "com.centurylinklabs.zodiac.original-image"
-	scope                  = "com.centurylinklabs.watchtower.scope"
-	preCheckLabel          = "com.centurylinklabs.watchtower.lifecycle.pre-check"
-	postCheckLabel         = "com.centurylinklabs.watchtower.lifecycle.post-check"
-	preUpdateLabel         = "com.centurylinklabs.watchtower.lifecycle.pre-update"
-	postUpdateLabel        = "com.centurylinklabs.watchtower.lifecycle.post-update"
-	preUpdateTimeoutLabel  = "com.centurylinklabs.watchtower.lifecycle.pre-update-timeout"
-	postUpdateTimeoutLabel = "com.centurylinklabs.watchtower.lifecycle.post-update-timeout"
+	watchtowerLabel         = "com.centurylinklabs.watchtower"
+	signalLabel             = "com.centurylinklabs.watchtower.stop-signal"
+	enableLabel             = "com.centurylinklabs.watchtower.enable"
+	monitorOnlyLabel        = "com.centurylinklabs.watchtower.monitor-only"
+	noPullLabel             = "com.centurylinklabs.watchtower.no-pull"
+	dependsOnLabel          = "com.centurylinklabs.watchtower.depends-on"
+	zodiacLabel             = "com.centurylinklabs.zodiac.original-image"
+	scope                   = "com.centurylinklabs.watchtower.scope"
+	preCheckLabel           = "com.centurylinklabs.watchtower.lifecycle.pre-check"
+	postCheckLabel          = "com.centurylinklabs.watchtower.lifecycle.post-check"
+	preUpdateLabel          = "com.centurylinklabs.watchtower.lifecycle.pre-update"
+	postUpdateLabel         = "com.centurylinklabs.watchtower.lifecycle.post-update"
+	preUpdateTimeoutLabel   = "com.centurylinklabs.watchtower.lifecycle.pre-update-timeout"
+	postUpdateTimeoutLabel  = "com.centurylinklabs.watchtower.lifecycle.post-update-timeout"
+	composeServiceNameLabel = "com.docker.compose.service"
 )
 
 // GetLifecyclePreCheckCommand returns the pre-check command set in the container metadata or an empty string
