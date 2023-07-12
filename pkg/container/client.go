@@ -304,7 +304,14 @@ func (client dockerClient) HasNewImage(ctx context.Context, container t.Containe
 		return false, currentImageID, nil
 	}
 
-	log.Infof("Found new %s image (%s)", imageName, newImageID.ShortID())
+	var outName string
+	if container.ComposeServiceName() != "/" {
+		outName = container.ComposeServiceName()
+	} else {
+		outName = container.Name()
+	}
+
+	log.Infof("Container: %s - found new %s image (%s)", outName, imageName, newImageID.ShortID())
 	return true, newImageID, nil
 }
 

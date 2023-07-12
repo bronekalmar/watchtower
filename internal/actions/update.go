@@ -94,6 +94,10 @@ func Update(client container.Client, params types.UpdateParams) (types.Report, e
 	if params.LifecycleHooks {
 		lifecycle.ExecutePostChecks(client, params)
 	}
+
+	if len(progress.Report().Failed()) == 0 && params.MonitorOnlyOverride {
+		log.Info("Update finished")
+	}
 	return progress.Report(), nil
 }
 
