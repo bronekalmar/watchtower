@@ -8,9 +8,9 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/containrrr/watchtower/pkg/api"
-	metricsAPI "github.com/containrrr/watchtower/pkg/api/metrics"
-	"github.com/containrrr/watchtower/pkg/metrics"
+	"github.com/bronekalmar/watchtower/pkg/api"
+	metricsAPI "github.com/bronekalmar/watchtower/pkg/api/metrics"
+	"github.com/bronekalmar/watchtower/pkg/metrics"
 
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"

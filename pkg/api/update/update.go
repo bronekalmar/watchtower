@@ -50,7 +50,7 @@ type Handler struct {
 
 // Handle is the actual http.Handle function doing all the heavy lifting
 func (handle *Handler) Handle(w http.ResponseWriter, r *http.Request) {
-	log.Info("Updates triggered by HTTP API request.")
+	log.Debug("Updates triggered by HTTP API request.")
 
 	_, err := io.Copy(os.Stdout, r.Body)
 	if err != nil {

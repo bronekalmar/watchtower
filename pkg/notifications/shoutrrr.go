@@ -10,9 +10,9 @@ import (
 	"text/template"
 	"time"
 
-	"github.com/containrrr/shoutrrr"
-	"github.com/containrrr/shoutrrr/pkg/types"
-	t "github.com/containrrr/watchtower/pkg/types"
+	"github.com/bronekalmar/shoutrrr"
+	"github.com/bronekalmar/shoutrrr/pkg/types"
+	t "github.com/bronekalmar/watchtower/pkg/types"
 	log "github.com/sirupsen/logrus"
 	"golang.org/x/text/cases"
 	"golang.org/x/text/language"

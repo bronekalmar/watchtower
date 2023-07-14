@@ -7,10 +7,10 @@ import (
 	"strings"
 	"time"
 
-	"github.com/containrrr/watchtower/pkg/registry"
-	"github.com/containrrr/watchtower/pkg/registry/digest"
+	"github.com/bronekalmar/watchtower/pkg/registry"
+	"github.com/bronekalmar/watchtower/pkg/registry/digest"
 
-	t "github.com/containrrr/watchtower/pkg/types"
+	t "github.com/bronekalmar/watchtower/pkg/types"
 	"github.com/docker/docker/api/types"
 	"github.com/docker/docker/api/types/container"
 	"github.com/docker/docker/api/types/filters"

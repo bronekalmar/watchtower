@@ -3,10 +3,10 @@ package container
 import (
 	"time"
 
-	"github.com/containrrr/watchtower/internal/util"
-	"github.com/containrrr/watchtower/pkg/container/mocks"
-	"github.com/containrrr/watchtower/pkg/filters"
-	t "github.com/containrrr/watchtower/pkg/types"
+	"github.com/bronekalmar/watchtower/internal/util"
+	"github.com/bronekalmar/watchtower/pkg/container/mocks"
+	"github.com/bronekalmar/watchtower/pkg/filters"
+	t "github.com/bronekalmar/watchtower/pkg/types"
 
 	"github.com/docker/docker/api/types"
 	"github.com/docker/docker/api/types/backend"
