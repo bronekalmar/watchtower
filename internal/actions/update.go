@@ -75,7 +75,7 @@ func Update(client container.Client, params types.UpdateParams) (types.Report, e
 	var containersToUpdate []types.Container
 	if !params.MonitorOnly || params.MonitorOnlyOverride {
 		for _, c := range containers {
-			if !c.IsMonitorOnly() {
+			if !c.IsMonitorOnly() || params.MonitorOnlyOverride {
 				containersToUpdate = append(containersToUpdate, c)
 				progress.MarkForUpdate(c.ID())
 			}
@@ -85,7 +85,7 @@ func Update(client container.Client, params types.UpdateParams) (types.Report, e
 	if params.RollingRestart {
 		progress.UpdateFailed(performRollingRestart(containersToUpdate, client, params))
 	} else {
-		failedStop, stoppedImages := stopContainersInReversedOrder(containersToUpdate, client, params)
+		failedStop, stoppedImages := stopContainersInOrder(containersToUpdate, client, params)
 		progress.UpdateFailed(failedStop)
 		failedStart := restartContainersInSortedOrder(containersToUpdate, client, params, stoppedImages)
 		progress.UpdateFailed(failedStart)
@@ -127,10 +127,11 @@ func performRollingRestart(containers []types.Container, client container.Client
 	return failed
 }
 
-func stopContainersInReversedOrder(containers []types.Container, client container.Client, params types.UpdateParams) (failed map[types.ContainerID]error, stopped map[types.ImageID]bool) {
+func stopContainersInOrder(containers []types.Container, client container.Client, params types.UpdateParams) (failed map[types.ContainerID]error, stopped map[types.ImageID]bool) {
 	failed = make(map[types.ContainerID]error, len(containers))
 	stopped = make(map[types.ImageID]bool, len(containers))
-	for i := len(containers) - 1; i >= 0; i-- {
+	// for i := len(containers) - 1; i >= 0; i-- {
+	for i := 0; i < len(containers); i++ {
 		if err := stopStaleContainer(containers[i], client, params); err != nil {
 			failed[containers[i].ID()] = err
 		} else {
@@ -183,7 +184,9 @@ func restartContainersInSortedOrder(containers []types.Container, client contain
 	cleanupImageIDs := make(map[types.ImageID]bool, len(containers))
 	failed := make(map[types.ContainerID]error, len(containers))
 
-	for _, c := range containers {
+	// for _, c := range containers {
+	for i := len(containers) - 1; i >= 0; i-- {
+		c := containers[i]
 		if !c.ToRestart() {
 			continue
 		}

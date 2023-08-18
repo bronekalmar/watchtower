@@ -168,6 +168,7 @@ func (client dockerClient) GetContainer(containerID t.ContainerID) (t.Container,
 
 func (client dockerClient) StopContainer(c t.Container, timeout time.Duration) error {
 	bg := context.Background()
+	hostConfig := c.GetCreateHostConfig()
 	signal := c.StopSignal()
 	if signal == "" {
 		signal = defaultStopSignal
@@ -175,6 +176,15 @@ func (client dockerClient) StopContainer(c t.Container, timeout time.Duration) e
 
 	idStr := string(c.ID())
 	shortID := c.ID().ShortID()
+	// replace PidMode container ID by container NAME
+	// to start dependent container with correct container pid namespace
+	if hostConfig.PidMode.Container() != "" {
+		pidContainerId := hostConfig.PidMode.Container()
+		log.Debug("PidMode current container ID: ", pidContainerId)
+		pidContainerName, _ := client.GetContainer(t.ContainerID(pidContainerId))
+		hostConfig.PidMode = container.PidMode("container:" + pidContainerName.Name())
+		log.Debug("PidMode container NAME to use: ", hostConfig.PidMode)
+	}
 
 	if c.IsRunning() {
 		log.Infof("Stopping %s (%s) with %s", c.Name(), shortID, signal)
@@ -212,6 +222,7 @@ func (client dockerClient) StartContainer(c t.Container) (t.ContainerID, error) 
 	bg := context.Background()
 	config := c.GetCreateConfig()
 	hostConfig := c.GetCreateHostConfig()
+
 	networkConfig := &network.NetworkingConfig{EndpointsConfig: c.ContainerInfo().NetworkSettings.Networks}
 	// simpleNetworkConfig is a networkConfig with only 1 network.
 	// see: https://github.com/docker/docker/issues/29265
